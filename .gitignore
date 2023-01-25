@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+
+__pycache__/
+*.py[cod]
+db.sqlite3
+migrations/
+media/
+settings.py
+
+djangoenv/
+
+index.html
+main.js
+passenger_wsgi.py
