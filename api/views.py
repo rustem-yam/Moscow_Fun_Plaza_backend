@@ -5,9 +5,10 @@ from .models import Event, EventTag
 from rest_framework.response import Response
 
 
-def auth_check(request):
-  if not request.user.is_authenticated:
-    return Response({'Access Denied': f'User must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
+# def auth_check(request):
+#   if not request.user.is_authenticated:
+#     return Response({'Access Denied': f'User must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
+
 # Create your views here.
 class EventView(generics.ListAPIView):
   queryset = Event.objects.all()
@@ -18,7 +19,8 @@ class GetEventView(APIView):
   serializer_class = EventSerializer
   
   def get(self, request, format=None):
-    auth_check(request=request)
+    if not request.user.is_authenticated:
+      return Response({'Access Denied': f'User must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
 
     limit = request.GET.get('limit')
     if limit == None:
@@ -56,12 +58,13 @@ class CreateEventView(APIView):
 
 
 class GetRecommendEventView(APIView):
-  serializer_class = EventTagSerializer
 
   def get(self, request, format=None):
-    auth_check(request=request)
-    user_fav_tags = list(self.serializer_class(tag).data['name'] for tag in request.user.fav_tags.all())
-    user_liked_events = list(self.serializer_class(event).data['name'] for event in request.user.liked_events.all())
+    if not request.user.is_authenticated:
+      return Response({'Access Denied': f'User must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
+
+    user_fav_tags = list(EventTagSerializer(tag).data['name'] for tag in request.user.fav_tags.all())
+    user_liked_events = list(EventSerializer(event).data['name'] for event in request.user.liked_events.all())
     # return Response(user_liked_events, status=status.HTTP_200_OK)
     tag_coeff = {}
     all_tags = [EventTagSerializer(tag).data['name'] for tag in EventTag.objects.all()]
@@ -88,7 +91,9 @@ class GetRecommendEventView(APIView):
 
       rec_dict[event['name']] = total_coeff
     
-    data = sorted(rec_dict, key=rec_dict.get, reverse=True)
+    rec_list_sorted = sorted(rec_dict, key=rec_dict.get, reverse=True)
+
+    data = [EventSerializer(Event.objects.get(name=name)).data for name in rec_list_sorted]
 
 
     return Response(data, status=status.HTTP_200_OK)
