@@ -2,14 +2,15 @@ from django.contrib.auth.models import BaseUserManager
 
 
 class CustomUserManager(BaseUserManager):
-  def create_user(self, email, name, password, liked_events=None, **extra_fields):
+  def create_user(self, email, name, password, **extra_fields):
     if not email:
       return ValueError('Users must have an email address')
   
     user = self.model(
       email=self.normalize_email(email),
       name=name,
-      liked_events=liked_events,
+      # liked_events=liked_events.set(),
+      # fav_tags=fav_tags.set(),
       **extra_fields,
     )
 
