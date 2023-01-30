@@ -22,13 +22,18 @@ class GetEventView(APIView):
     if not request.user.is_authenticated:
       return Response({'Access Denied': f'User must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
 
-    limit = request.GET.get('limit')
-    if limit == None:
-      data = [self.serializer_class(event).data for event in Event.objects.all()]
-      return Response(data, status=status.HTTP_200_OK)
-    if not limit.isdigit():
-      return Response({'Bad request': 'Limit parameter must be integer'}, status=status.HTTP_400_BAD_REQUEST)
-    data = list(self.serializer_class(event).data for event in Event.objects.all()[:int(limit)])
+    limit = request.GET.get('_limit')
+    page = request.GET.get('_page')
+
+    data = [self.serializer_class(event).data for event in Event.objects.all()]
+    if limit != None and limit.isdigit():
+      if page == None or not page.isdigit():
+        page = 1
+      limit = int(limit)
+      page = int(page)
+
+      data = list(self.serializer_class(event).data for event in Event.objects.all()[limit*(page-1) : limit*page])
+
     return Response(data, status=status.HTTP_200_OK)
     
 
@@ -63,6 +68,9 @@ class GetRecommendEventView(APIView):
     if not request.user.is_authenticated:
       return Response({'Access Denied': f'User must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
 
+    limit = request.GET.get('_limit')
+    page = request.GET.get('_page')
+
     user_fav_tags = list(EventTagSerializer(tag).data['name'] for tag in request.user.fav_tags.all())
     user_liked_events = list(EventSerializer(event).data['name'] for event in request.user.liked_events.all())
     # return Response(user_liked_events, status=status.HTTP_200_OK)
@@ -90,10 +98,16 @@ class GetRecommendEventView(APIView):
         total_coeff += tag_coeff[tag['name']]
 
       rec_dict[event['name']] = total_coeff
-    
+
     rec_list_sorted = sorted(rec_dict, key=rec_dict.get, reverse=True)
+    if limit != None and limit.isdigit():
+      if page == None or not page.isdigit():
+        page = 1
+      limit = int(limit)
+      page = int(page)
+      
+      rec_list_sorted = rec_list_sorted[limit*(page - 1) : limit*page]
 
     data = [EventSerializer(Event.objects.get(name=name)).data for name in rec_list_sorted]
-
 
     return Response(data, status=status.HTTP_200_OK)
