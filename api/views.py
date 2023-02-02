@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 # def auth_check(request):
 #   if not request.user.is_authenticated:
-#     return Response({'Access Denied': f'User must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
+#     return Response({'Access Denied': f'User {request.user} must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
 
 # Create your views here.
 class EventView(generics.ListAPIView):
@@ -16,10 +16,12 @@ class EventView(generics.ListAPIView):
   serializer_class = EventSerializer
 
 
-class GetEventView(APIView, LoginRequiredMixin):
+class GetEventView(APIView):
   serializer_class = EventSerializer
   
   def get(self, request, format=None):
+    if not request.user.is_authenticated:
+      return Response({'Access Denied': f'User {request.user} must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
 
     limit = request.GET.get('_limit')
     page = request.GET.get('_page')
@@ -61,9 +63,11 @@ class CreateEventView(APIView):
     return Response(EventSerializer(event).data, status=status.HTTP_201_CREATED)
 
 
-class GetRecommendEventView(APIView, LoginRequiredMixin):
+class GetRecommendEventView(APIView):
 
   def get(self, request, format=None):
+    if not request.user.is_authenticated:
+      return Response({'Access Denied': f'User {request.user} must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
 
     limit = request.GET.get('_limit')
     page = request.GET.get('_page')
