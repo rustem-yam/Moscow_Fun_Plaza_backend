@@ -16,12 +16,12 @@ class EventView(generics.ListAPIView):
   serializer_class = EventSerializer
 
 
-class GetEventView(APIView):
+class GetEventView(APIView, LoginRequiredMixin):
   serializer_class = EventSerializer
   
   def get(self, request, format=None):
-    if not request.user.is_authenticated:
-      return Response({'Access Denied': f'User {request.user} must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
+#    if not request.user.is_authenticated:
+#      return Response({'Access Denied': f'User {request.user} must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
 
     limit = request.GET.get('_limit')
     page = request.GET.get('_page')
@@ -63,11 +63,11 @@ class CreateEventView(APIView):
     return Response(EventSerializer(event).data, status=status.HTTP_201_CREATED)
 
 
-class GetRecommendEventView(APIView):
+class GetRecommendEventView(APIView, LoginRequiredMixin):
 
   def get(self, request, format=None):
-    if not request.user.is_authenticated:
-      return Response({'Access Denied': f'User {request.user} must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
+#    if not request.user.is_authenticated:
+#      return Response({'Access Denied': f'User {request.user} must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
 
     limit = request.GET.get('_limit')
     page = request.GET.get('_page')
