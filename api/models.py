@@ -2,14 +2,14 @@ from django.db import models
 
 # Create your models here.
 class EventTag(models.Model):
-  name = models.CharField(max_length=100)
+  name = models.CharField(max_length=100, unique=True)
   
   def __str__(self) -> str:
     return self.name
 
 
 class EventType(models.Model):
-  name = models.CharField(max_length=100)
+  name = models.CharField(max_length=100, unique=True)
 
   def __str__(self) -> str:
     return self.name
@@ -17,7 +17,7 @@ class EventType(models.Model):
 
 
 class Event(models.Model):
-  name = models.CharField(max_length=200)
+  name = models.CharField(max_length=200, unique=True)
   description = models.CharField(max_length=500, null=True, blank=True)
   date = models.DateField(auto_now=False, auto_now_add=False)
   ticket_price = models.IntegerField(default=0)
