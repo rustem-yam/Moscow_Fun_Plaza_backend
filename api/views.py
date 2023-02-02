@@ -3,6 +3,7 @@ from rest_framework import status, generics
 from .serializers import EventSerializer, EventTagSerializer
 from .models import Event, EventTag
 from rest_framework.response import Response
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 # def auth_check(request):
@@ -15,12 +16,10 @@ class EventView(generics.ListAPIView):
   serializer_class = EventSerializer
 
 
-class GetEventView(APIView):
+class GetEventView(APIView, LoginRequiredMixin):
   serializer_class = EventSerializer
   
   def get(self, request, format=None):
-    if not request.user.is_authenticated:
-      return Response({'Access Denied': f'User must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
 
     limit = request.GET.get('_limit')
     page = request.GET.get('_page')
@@ -62,11 +61,9 @@ class CreateEventView(APIView):
     return Response(EventSerializer(event).data, status=status.HTTP_201_CREATED)
 
 
-class GetRecommendEventView(APIView):
+class GetRecommendEventView(APIView, LoginRequiredMixin):
 
   def get(self, request, format=None):
-    if not request.user.is_authenticated:
-      return Response({'Access Denied': f'User must be authenticated'}, status=status.HTTP_403_FORBIDDEN)
 
     limit = request.GET.get('_limit')
     page = request.GET.get('_page')

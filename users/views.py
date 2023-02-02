@@ -1,7 +1,5 @@
 from rest_framework.views import APIView
 from rest_framework import status, generics
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from django.contrib.auth import login, authenticate, logout
 # from django.shortcuts import redirect
 from .serializers import UserSerializer, RegisterUserSerializer, LoginUserSerializer
@@ -58,7 +56,7 @@ class LoginUserView(APIView):
     login(request, user)
     return Response({"Login Successfully": f'{user}'}, status=status.HTTP_202_ACCEPTED)
 
-@method_decorator(csrf_exempt, name='dispatch')
+
 class LogoutUserView(APIView):
   def post(self, request, format=None):
     logout(request)

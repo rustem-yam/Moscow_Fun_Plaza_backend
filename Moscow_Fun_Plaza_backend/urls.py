@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('users/', include('users.urls')),
-    path('', RedirectView.as_view(url='admin/', permanent=False), name='index')
+    path('github/', RedirectView.as_view(url='https://github.com/rustem-yam/Moscow_Fun_Plaza_backend', permanent=False), name='github'),
+    path('', RedirectView.as_view(url='admin/', permanent=False), name='index'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
